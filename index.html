@@ -9,6 +9,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>実験②</title>
     <style>
+        #emoji {
+            position: absolute;
+            font-size: 650px;
+            top: 42%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            pointer-events: none;
+            animation: fade-out 3s ease-in-out forwards;
+        }
         #button {
             position: absolute;
             top: 92%;
@@ -42,34 +52,23 @@
             pointer-events: none;
         }
 
-        .like-item {
+        /* .like-item {
             position: absolute;
             top: 0;
             left: 0;
             margin: 0;
             font-size: 650px;
             transform: translate(-50%, -50%);
-            /* margin-left: -715px; */
-            /* margin-top: -730px; */
             animation: fade-out 3s ease-in-out forwards;
-        }
+        } */
 
-        @keyframes fade-out {
-            from {
-                opacity: 1;
-            }
-
-            to {
-                opacity: 0;
-            }
-        }
 
         #topic1 {
             position: absolute;
             top: 10%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 3.2rem;
+            font-size: 3.0rem;
             color: black;
             text-align: center;
             z-index: 10;
@@ -93,7 +92,6 @@
             z-index: 0;
             /* 改行を無視するnowrapを設定 */
         }
-
         .timer-container {
             text-align: center;
         }
@@ -123,13 +121,15 @@
 
 <body>
     <button id="button">発話衝突ボタン</button>
+    <div id="emoji"></div>
     <div id="like-container"></div>
     <div id="topic1">
         <font color="#c7000b"><b>発話衝突を肯定的に捉えて</b></font>議論を行ってください
     </div>
     <div id="topic2">議題：東日本を象徴する観光地を一つに決めてください</div>
 
-    <button id="startTimer">Start Timer</button>
+    <!-- <button id="startTimer">Start Timer</button> -->
+    <div id="startTimer"></div>
     <div id="timer">5:00</div>
 
 
@@ -139,33 +139,70 @@
     <script>
         let socket = io();
         var button = document.getElementById("button");
-        var container = document.getElementById("like-container");
         button.addEventListener("click", function (event) {
-            var like = document.createElement("p");
-            like.innerHTML = "👍";
-            like.classList.add("like-item");
-            container.appendChild(like);
+            var emoji = document.getElementById('emoji');
+                emoji.innerHTML = '👍';
+                emoji.style.opacity = 1;
 
-            var x = event.clientX;
-            var y = event.clientY;
-            like.style.top = y;
-            like.style.left = x;
-            socket.emit("like1", like.innerHTML);
-        });
-        socket.on("like1", function (emoji) {
-            console.log(emoji);
-            var like = document.createElement("p");
-            like.innerHTML = "👍";
-            like.classList.add("like-item");
-            container.appendChild(like);
-            var x = event.clientX;
-            var y = event.clientY;
-            like.style.top = y;
-            like.style.left = x;
+                setTimeout(function () {
+                    emoji.style.transition = 'opacity 3s';
+                    emoji.style.opacity = 0;
+                }, 1100);
+                emoji.style.transition = 'opacity 0s';
+                socket.emit("like1", emoji.innerHTML);
+            });
+        socket.on("like1", function (emoji1) {
+            console.log(emoji1);
+            var emoji = document.getElementById('emoji');
+            emoji.innerHTML = '👍';
+            emoji.style.opacity = 1;
+            setTimeout(function () {
+                emoji.style.transition = 'opacity 3s';
+                emoji.style.opacity = 0;
+            }, 1100);
+            emoji.style.transition = 'opacity 0s';
         });
 
-        document.querySelector('#startTimer').addEventListener('click', () => {
-            socket.emit('startTimer');
+
+        
+        // var button = document.getElementById("button");
+        // var container = document.getElementById("like-container");
+        // button.addEventListener("click", function (event) {
+        //     var like = document.createElement("p");
+        //     like.innerHTML = "👍";
+        //     like.classList.add("like-item");
+        //     container.appendChild(like);
+
+        //     var x = event.clientX;
+        //     var y = event.clientY;
+        //     like.style.top = y;
+        //     like.style.left = x;
+        //     socket.emit("like1", like.innerHTML);
+        // });
+        // socket.on("like1", function (emoji) {
+        //     console.log(emoji);
+        //     var like = document.createElement("p");
+        //     like.innerHTML = "👍";
+        //     like.classList.add("like-item");
+        //     container.appendChild(like);
+        //     var x = event.clientX;
+        //     var y = event.clientY;
+        //     like.style.top = y;
+        //     like.style.left = x;
+        // });
+
+        // document.querySelector('#startTimer').addEventListener('click', () => {
+        //     socket.emit('startTimer');
+        // });
+
+        // socket.on('updateTimer', (currentTime) => {
+        //     document.querySelector('#timer').textContent = currentTime;
+        // });
+
+        document.addEventListener('keydown', function(event){
+            if(event.keyCode === 50 && event.ctrlKey && event.altKey&& event.shiftKey){
+                socket.emit('startTimer');
+            }
         });
 
         socket.on('updateTimer', (currentTime) => {
