@@ -20,7 +20,7 @@ io.on("connection", (socket) => {
 
 
   socket.on('startTimer', () => {
-    let time = 100;
+    let time = 300;
 
     const timer = setInterval(() => {
       time--;
